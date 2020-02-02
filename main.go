@@ -1,16 +1,13 @@
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
-	"strings"
-
-	"fmt"
-	"log"
-
 	"errors"
-
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -19,8 +16,12 @@ import (
 )
 
 var (
-	creds  *credentials.Credentials = credentials.NewChainCredentials([]credentials.Provider{&credentials.EnvProvider{}, &credentials.SharedCredentialsProvider{}})
-	client *route53.Route53         = route53.New(session.New(&aws.Config{Credentials: creds}))
+	creds = credentials.NewChainCredentials([]credentials.Provider{&credentials.EnvProvider{}, &credentials.SharedCredentialsProvider{}})
+	sess  = session.Must(session.NewSessionWithOptions(session.Options{
+		Config:            aws.Config{Credentials: creds},
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	client = route53.New(sess)
 )
 
 func main() {
