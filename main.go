@@ -1,16 +1,12 @@
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
-	"strings"
-
 	"fmt"
+	"io/ioutil"
 	"log"
-
-	"errors"
-
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -19,8 +15,12 @@ import (
 )
 
 var (
-	creds  *credentials.Credentials = credentials.NewChainCredentials([]credentials.Provider{&credentials.EnvProvider{}, &credentials.SharedCredentialsProvider{}})
-	client *route53.Route53         = route53.New(session.New(&aws.Config{Credentials: creds}))
+	creds = credentials.NewChainCredentials([]credentials.Provider{&credentials.EnvProvider{}, &credentials.SharedCredentialsProvider{}})
+	sess  = session.Must(session.NewSessionWithOptions(session.Options{
+		Config:            aws.Config{Credentials: creds},
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	client = route53.New(sess)
 )
 
 func main() {
@@ -29,16 +29,16 @@ func main() {
 	}
 	domain := os.Args[1]
 
-	id, err := GetZoneId(domain)
+	id, err := GetZoneID(domain)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rip, err := GetRecordIp(domain, id)
+	rip, err := GetRecordIP(domain, id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Print("record's ip: " + rip)
-	cip, err := GetCurrentIp()
+	cip, err := GetCurrentIP()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func main() {
 	log.Print(fmt.Sprintf("ip changed: %s -> %s", rip, cip))
 }
 
-func GetCurrentIp() (string, error) {
+func GetCurrentIP() (string, error) {
 	res, err := http.Get("https://api.ipify.org")
 	if err != nil {
 		return "", err
@@ -91,7 +91,7 @@ func SetRecord(record, zoneid, ip string) error {
 	return nil
 }
 
-func GetRecordIp(record, zoneid string) (string, error) {
+func GetRecordIP(record, zoneid string) (string, error) {
 	out, err := client.ListResourceRecordSets(&route53.ListResourceRecordSetsInput{
 		HostedZoneId:    aws.String(zoneid),
 		StartRecordName: aws.String(record),
@@ -108,7 +108,7 @@ func GetRecordIp(record, zoneid string) (string, error) {
 	return ip, nil
 }
 
-func GetZoneId(record string) (string, error) {
+func GetZoneID(record string) (string, error) {
 	_d := strings.Split(record, ".")
 	d := strings.Join(_d[len(_d)-2:], ".") // truncate subdomain
 	out, err := client.ListHostedZones(&route53.ListHostedZonesInput{})
@@ -120,5 +120,5 @@ func GetZoneId(record string) (string, error) {
 			return *out.HostedZones[i].Id, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf(`No zone matched with "%s"`, d))
+	return "", fmt.Errorf(`No zone matched with "%s"`, d)
 }
