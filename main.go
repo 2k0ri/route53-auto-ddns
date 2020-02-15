@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -121,5 +120,5 @@ func GetZoneId(record string) (string, error) {
 			return *out.HostedZones[i].Id, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf(`No zone matched with "%s"`, d))
+	return "", fmt.Errorf(`No zone matched with "%s"`, d)
 }
