@@ -29,16 +29,16 @@ func main() {
 	}
 	domain := os.Args[1]
 
-	id, err := GetZoneId(domain)
+	id, err := GetZoneID(domain)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rip, err := GetRecordIp(domain, id)
+	rip, err := GetRecordIP(domain, id)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Print("record's ip: " + rip)
-	cip, err := GetCurrentIp()
+	cip, err := GetCurrentIP()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,7 +54,7 @@ func main() {
 	log.Print(fmt.Sprintf("ip changed: %s -> %s", rip, cip))
 }
 
-func GetCurrentIp() (string, error) {
+func GetCurrentIP() (string, error) {
 	res, err := http.Get("https://api.ipify.org")
 	if err != nil {
 		return "", err
@@ -91,7 +91,7 @@ func SetRecord(record, zoneid, ip string) error {
 	return nil
 }
 
-func GetRecordIp(record, zoneid string) (string, error) {
+func GetRecordIP(record, zoneid string) (string, error) {
 	out, err := client.ListResourceRecordSets(&route53.ListResourceRecordSetsInput{
 		HostedZoneId:    aws.String(zoneid),
 		StartRecordName: aws.String(record),
@@ -108,7 +108,7 @@ func GetRecordIp(record, zoneid string) (string, error) {
 	return ip, nil
 }
 
-func GetZoneId(record string) (string, error) {
+func GetZoneID(record string) (string, error) {
 	_d := strings.Split(record, ".")
 	d := strings.Join(_d[len(_d)-2:], ".") // truncate subdomain
 	out, err := client.ListHostedZones(&route53.ListHostedZonesInput{})
