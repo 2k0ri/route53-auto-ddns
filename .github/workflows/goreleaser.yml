@@ -1,0 +1,23 @@
+name: Release
+on:
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: GoReleaser
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        version: 1.13.8
+    - name: Run go mod download
+      run: go mod download
+    - name: Run GoReleaser
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: curl -sL https://git.io/goreleaser | bash
