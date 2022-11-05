@@ -22,7 +22,7 @@ func main() {
 	domain := os.Args[1]
 
 	ctx := context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("us-east-1"))
 	if err != nil {
 		log.Fatal(err)
 	}

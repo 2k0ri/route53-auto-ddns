@@ -16,7 +16,7 @@ var (
 
 func TestMain(m *testing.M) {
 	ctx = context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("us-east-1"))
 	if err != nil {
 		panic(err)
 	}
