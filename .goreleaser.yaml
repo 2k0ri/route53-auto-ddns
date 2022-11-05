@@ -1,0 +1,30 @@
+# .goreleaser.yaml
+builds:
+  # You can have multiple builds defined as a yaml list
+  -
+    # GOARCH to build for.
+    # For more info refer to: https://golang.org/doc/install/source#environment
+    # Defaults are 386, amd64 and arm64.
+    goarch:
+      - amd64
+      - arm
+      - arm64
+      - mips
+      - mips64
+      - mipsle
+      - mips64le
+
+    # GOARM to build for when GOARCH is arm.
+    # For more info refer to: https://golang.org/doc/install/source#environment
+    # Default is only 6.
+    goarm:
+      - 6
+      - 7
+
+    # GOAMD64 to build when GOARCH is amd64.
+    # For more info refer to: https://golang.org/doc/install/source#environment
+    # Default is only v1.
+    goamd64:
+      - v1
+      - v2
+      - v3
